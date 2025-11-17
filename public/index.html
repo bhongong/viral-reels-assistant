@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viral Reels Assistant - AI-Powered Video Script Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .platform-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .platform-option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .platform-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .platform-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .platform-option .icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .scene-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .scene-header {
+            font-weight: 600;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .scene-detail {
+            margin-bottom: 8px;
+        }
+
+        .scene-detail strong {
+            color: #555;
+        }
+
+        .analysis-card {
+            background: #fff3cd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .model-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .model-option {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+            font-size: 0.9em;
+        }
+
+        .model-option:hover {
+            border-color: #667eea;
+        }
+
+        .model-option.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Viral Reels Assistant</h1>
+            <p>Transform your ideas into viral video content with AI</p>
+        </header>
+
+        <div class="main-card">
+            <form id="ideaForm">
+                <div class="form-group">
+                    <label for="idea">Your Video Idea</label>
+                    <textarea id="idea" placeholder="Describe your video idea... (e.g., 'A quick tutorial on making perfect coffee at home')" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Select Platform</label>
+                    <div class="platform-selector">
+                        <div class="platform-option" data-platform="tiktok">
+                            <div class="icon">🎵</div>
+                            <div>TikTok</div>
+                        </div>
+                        <div class="platform-option" data-platform="instagram">
+                            <div class="icon">📸</div>
+                            <div>Instagram</div>
+                        </div>
+                        <div class="platform-option" data-platform="youtube">
+                            <div class="icon">▶️</div>
+                            <div>YouTube</div>
+                        </div>
+                        <div class="platform-option" data-platform="facebook">
+                            <div class="icon">👍</div>
+                            <div>Facebook</div>
+                        </div>
+                        <div class="platform-option" data-platform="linkedin">
+                            <div class="icon">💼</div>
+                            <div>LinkedIn</div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="platform" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Video Generation Model (Optional)</label>
+                    <div class="model-selector">
+                        <div class="model-option selected" data-model="veo3">VEO3</div>
+                        <div class="model-option" data-model="grok">Grok</div>
+                        <div class="model-option" data-model="wan2.1">WAN 2.1</div>
+                        <div class="model-option" data-model="wan2.2">WAN 2.2</div>
+                    </div>
+                    <input type="hidden" id="model" value="veo3">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="generateBtn">
+                    ✨ Generate Script & Video
+                </button>
+                <button type="button" class="btn btn-secondary" id="analyzeOnlyBtn">
+                    🔍 Analyze Idea Only
+                </button>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Creating your viral content... This may take a moment.</p>
+            </div>
+
+            <div id="results" class="result-section">
+                <h2>📝 Results</h2>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Powered by AI • Supporting TikTok, Instagram, YouTube, Facebook & LinkedIn</p>
+        </footer>
+    </div>
+
+    <script>
+        let selectedPlatform = '';
+        let selectedModel = 'veo3';
+
+        // Platform selection
+        document.querySelectorAll('.platform-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.platform-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPlatform = this.dataset.platform;
+                document.getElementById('platform').value = selectedPlatform;
+            });
+        });
+
+        // Model selection
+        document.querySelectorAll('.model-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedModel = this.dataset.model;
+                document.getElementById('model').value = selectedModel;
+            });
+        });
+
+        // Analyze only button
+        document.getElementById('analyzeOnlyBtn').addEventListener('click', async function() {
+            const idea = document.getElementById('idea').value;
+            if (!idea || !selectedPlatform) {
+                alert('Please enter an idea and select a platform');
+                return;
+            }
+
+            showLoading(true);
+            hideResults();
+
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ idea, platform: selectedPlatform })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAnalysisResults(data.analysis);
+                } else {
+                    showError(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('Failed to analyze idea: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Generate form submission
+        document.getElementById('ideaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const idea = document.getElementById('idea').value;
+            if (!selectedPlatform) {
+                alert('Please select a platform');
+                return;
+            }
+
+            showLoading(true);
+            hideResults();
+
+            try {
+                const response = await fetch('/api/script/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        idea, 
+                        platform: selectedPlatform
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showScriptResults(data.script);
+                } else {
+                    showError(data.error || 'Generation failed');
+                }
+            } catch (error) {
+                showError('Failed to generate script: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+            document.getElementById('generateBtn').disabled = show;
+            document.getElementById('analyzeOnlyBtn').disabled = show;
+        }
+
+        function hideResults() {
+            document.getElementById('results').classList.remove('active');
+        }
+
+        function showResults() {
+            document.getElementById('results').classList.add('active');
+        }
+
+        function showAnalysisResults(analysis) {
+            const html = `
+                <div class="analysis-card">
+                    <h3>📊 Idea Analysis</h3>
+                    <pre style="white-space: pre-wrap; font-family: inherit;">${JSON.stringify(analysis, null, 2)}</pre>
+                </div>
+            `;
+            document.getElementById('resultsContent').innerHTML = html;
+            showResults();
+        }
+
+        function showScriptResults(script) {
+            let scenesHtml = '';
+            script.scenes.forEach(scene => {
+                scenesHtml += `
+                    <div class="scene-card">
+                        <div class="scene-header">Scene ${scene.sceneNumber}</div>
+                        <div class="scene-detail"><strong>Description:</strong> ${scene.description}</div>
+                        <div class="scene-detail"><strong>Duration:</strong> ${scene.duration}s</div>
+                        <div class="scene-detail"><strong>Visual Prompt:</strong> ${scene.visualPrompt}</div>
+                        <div class="scene-detail"><strong>Audio Prompt:</strong> ${scene.audioPrompt || 'N/A'}</div>
+                        ${scene.textOverlay ? `<div class="scene-detail"><strong>Text Overlay:</strong> ${scene.textOverlay}</div>` : ''}
+                        ${scene.transition ? `<div class="scene-detail"><strong>Transition:</strong> ${scene.transition}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            const html = `
+                <div class="success-message">
+                    ✅ Script generated successfully!
+                </div>
+                <h3>🎬 ${script.title}</h3>
+                <p><strong>Platform:</strong> ${script.platform.toUpperCase()}</p>
+                <p><strong>Story:</strong> ${script.story}</p>
+                ${script.metadata.hook ? `<p><strong>Hook:</strong> ${script.metadata.hook}</p>` : ''}
+                ${script.metadata.cta ? `<p><strong>Call-to-Action:</strong> ${script.metadata.cta}</p>` : ''}
+                <h3 style="margin-top: 30px;">🎞️ Scenes</h3>
+                ${scenesHtml}
+                <div style="margin-top: 20px;">
+                    <p><em>Note: Video generation requires API keys to be configured. The script is ready for video generation using ${selectedModel.toUpperCase()}.</em></p>
+                </div>
+            `;
+            document.getElementById('resultsContent').innerHTML = html;
+            showResults();
+        }
+
+        function showError(message) {
+            const html = `
+                <div class="error-message">
+                    ❌ ${message}
+                </div>
+            `;
+            document.getElementById('resultsContent').innerHTML = html;
+            showResults();
+        }
+    </script>
+</body>
+</html>
