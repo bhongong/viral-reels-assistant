@@ -1,0 +1,31 @@
+{
+  "name": "viral-reels-assistant",
+  "version": "1.0.0",
+  "description": "AI-powered SaaS platform for creating viral video scripts and content",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "echo \"No tests specified yet\" && exit 0"
+  },
+  "keywords": [
+    "ai",
+    "video",
+    "script",
+    "tiktok",
+    "instagram",
+    "youtube",
+    "content-creation",
+    "viral",
+    "reels"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "openai": "^6.9.0"
+  }
+}
